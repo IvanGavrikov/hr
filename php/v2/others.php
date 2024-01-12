@@ -3,7 +3,9 @@
 namespace NW\WebService\References\Operations\Notification;
 
 /**
- * @property Seller $Seller
+ * @property string $email
+ * @property string $mobile
+ * @property Seller $seller
  */
 class Contractor
 {
@@ -21,6 +23,16 @@ class Contractor
     {
         return $this->name . ' ' . $this->id;
     }
+
+    public function needNotificationByEmail(): bool
+    {
+        return trim($this->email) !== '';
+    }
+
+    public function needNotificationBySms(): bool
+    {
+        return trim($this->mobile) !== '';
+    }
 }
 
 class Seller extends Contractor
@@ -33,17 +45,15 @@ class Employee extends Contractor
 
 class Status
 {
-    public $id, $name;
+    private static $enum = [
+        0 => 'Completed',
+        1 => 'Pending',
+        2 => 'Rejected',
+    ];
 
     public static function getName(int $id): string
     {
-        $a = [
-            0 => 'Completed',
-            1 => 'Pending',
-            2 => 'Rejected',
-        ];
-
-        return $a[$id];
+        return static::$enum[$id] ?? '';
     }
 }
 
@@ -51,9 +61,9 @@ abstract class ReferencesOperation
 {
     abstract public function doOperation(): array;
 
-    public function getRequest($pName)
+    public function getRequest($pName): array
     {
-        return $_REQUEST[$pName];
+        return $_REQUEST[$pName] ?? [];
     }
 }
 
@@ -72,4 +82,9 @@ class NotificationEvents
 {
     const CHANGE_RETURN_STATUS = 'changeReturnStatus';
     const NEW_RETURN_STATUS    = 'newReturnStatus';
+}
+
+function __(string $templateName, array $templateData, int $sellerId): string
+{
+    return 'Fake message';
 }
